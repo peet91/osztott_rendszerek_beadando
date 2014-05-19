@@ -4,15 +4,59 @@ import java.util.*;
 import java.net.*;
 import java.io.*;
 
-public class DHTNode {
-	public static void main(final String[] args) throws UnknownHostException, IOException {
-		final int host = 65432;
+public class DHTNode extends Thread {
+	
+	int host;
+	int port;
+	int lowerBound;
+	int upperBound;
+	int[][] fingerTable = new int[16][2];
+	
+	Map<String, String> files = new HashMap<String, String>();
+	
+	public DHTNode() {
 		
-		final int port = Integer.parseInt(args[0]);
+	}
+	
+	public DHTNode(int paramPort) {
 		
-		Socket socket = new Socket("localhost", host);
+		host = 65432;
 		
-		PrintWriter pw = new PrintWriter(socket.getOutputStream());
+		this.port = paramPort;
+	}
+	
+	@Override
+	public void run()  {	
+		try {
+			
+			connectToDHTMain();
+			
+			ServerSocket dhtNodeServerSocket;
+			
+			dhtNodeServerSocket = new ServerSocket(port);
+			
+			startServer(dhtNodeServerSocket);
+			
+			files = new HashMap<String, String>();
+			
+			andDoTheHarlemShake(dhtNodeServerSocket);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void connectToDHTMain() throws UnknownHostException, IOException{
+		
+		Socket socket;
+		
+		socket = new Socket("localhost", host);
+		
+		PrintWriter pw;
+		
+		pw = new PrintWriter(socket.getOutputStream());
 		
 		//sending port to the DHTServer
 		System.out.println("Port to server: " + port);
@@ -22,9 +66,10 @@ public class DHTNode {
 		pw.close();
 		socket.close();
 		
-		//starting the individual server
-		ServerSocket dhtNodeServerSocket = new ServerSocket(port);
-		
+	}
+	
+	public void startServer(ServerSocket dhtNodeServerSocket) throws UnknownHostException, IOException{
+
 		Socket dhtServerListenerSocket = dhtNodeServerSocket.accept();
 		
 		System.out.println("Accepted connection from server on port: " + port);
@@ -32,9 +77,8 @@ public class DHTNode {
 				new InputStreamReader(dhtServerListenerSocket.getInputStream()));
 		
 		//taking the stuff from the server
-		int lowerBound = Integer.parseInt(br.readLine());
-		int upperBound = Integer.parseInt(br.readLine());
-		int[][] fingerTable = new int[16][2];
+		lowerBound = Integer.parseInt(br.readLine());
+		upperBound = Integer.parseInt(br.readLine());
 		for (int i = 0; i < 16; i++) {
 			fingerTable[i][0] = Integer.parseInt(br.readLine());
 			fingerTable[i][1] = Integer.parseInt(br.readLine());
@@ -52,7 +96,11 @@ public class DHTNode {
 		br.close();
 		dhtServerListenerSocket.close();
 		
-		Map<String, String> files = new HashMap<String, String>();
+	}
+	
+	private void andDoTheHarlemShake(ServerSocket dhtNodeServerSocket) throws UnknownHostException, IOException{
+		// TODO Auto-generated method stub
+
 		
 		//main loop
 		while( true ) {
@@ -228,5 +276,5 @@ public class DHTNode {
 				//dhtNodeServerSocket.close();
 			}
 		}
-	}	
+	}
 }

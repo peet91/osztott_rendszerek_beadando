@@ -1,10 +1,10 @@
-package bead.dht;
+package bead.test;
 
 import java.util.*;
 import java.io.*;
 import java.net.*;
 
-class DHTClientLookup 
+class DHTClientUpload 
 {
   public static void main(String[] args)
     throws Exception
@@ -15,26 +15,23 @@ class DHTClientLookup
       int port = 12345;
       Socket s = new Socket(gep,port);
 
-      BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+      Scanner sc = new Scanner(s.getInputStream());
       PrintWriter pw = new PrintWriter(s.getOutputStream());
-      	/*    
+      	
         pw.println("upload fajlnev");
         pw.flush();
         pw.println("ASDASDASDASASDASDASDASDASDASDAS");
+        pw.println("WQERTQWERTQWERQWRTQWERTQWERQWET");
+        pw.println("sajt");
         pw.flush();
-        */
- 		
+        
+ 		/*
         pw.println("lookup fajlnev");
         pw.flush();
+        */
         
-        String line;
-
-        System.out.println("File content: ");
-        while((line = br.readLine()) != null) {
-        	System.out.println(line);
-        }
         
-      br.close();
+      sc.close();
       pw.close();
       s.close();
     }
